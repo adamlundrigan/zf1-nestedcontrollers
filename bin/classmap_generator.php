@@ -1,0 +1,1 @@
+../external/zf-examples/zf1-classmap/bin/classmap_generator.php
