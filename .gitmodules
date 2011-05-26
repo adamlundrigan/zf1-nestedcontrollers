@@ -1,0 +1,3 @@
+[submodule "external/zf-examples"]
+	path = external/zf-examples
+	url = git://github.com/weierophinney/zf-examples.git
