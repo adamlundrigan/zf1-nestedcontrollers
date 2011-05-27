@@ -19,6 +19,7 @@ free :))
 
 ## Props ##
 Show these guys some love:
+
 * Matthew Weier O'Phinney ([weierophinney](http://github.com/weierophinney)) for
   his work on the ZF2 classmap autoloader
 * Ryan Mauger ([bittarman](http://github.com/bittarman)) for showing me that ZFv1
