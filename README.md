@@ -17,6 +17,13 @@ stored in `external/zf-examples`.  It currently links everything from the
 (i'm a bit of a git newbie, so if you can suggest a better way to do this, feel
 free :))
 
+## Props ##
+Show these guys some love:
+* Matthew Weier O'Phinney ([weierophinney](http://github.com/weierophinney)) for
+  his work on the ZF2 classmap autoloader
+* Ryan Mauger ([bittarman](http://github.com/bittarman)) for showing me that ZFv1
+  could do nested controllers, and sharing an example: http://goo.gl/YDlBt
+
 USAGE
 -----
 
