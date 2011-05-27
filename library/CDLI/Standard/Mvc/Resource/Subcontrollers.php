@@ -69,9 +69,13 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
             $bootstrapSet = $modules->getExecutedBootstraps();
             foreach ( $bootstrapSet as $moduleName=>$moduleBootstrap )
             {
-                $this->frontController->getRouter()->addRoutes(
-                    $this->processModuleBootstrap($moduleBootstrap)
-                );
+                $routes = $this->processModuleBootstrap($moduleBootstrap);
+                if ( count($routes) > 0 )
+                {
+                    $this->frontController->getRouter()->addRoutes(
+                        $this->processModuleBootstrap($moduleBootstrap)
+                    );
+                }
             }
         }
     }
