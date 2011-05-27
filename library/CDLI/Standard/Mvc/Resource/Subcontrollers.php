@@ -38,5 +38,109 @@ require_once 'Zend/Application/Resource/ResourceAbstract.php';
  */
 class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resource_ResourceAbstract
 {
+    /**
+     * Application Bootstrap
+     * @var Zend_Application_Bootstrap_Bootstrap
+     */
+    protected $bootstrap;
+    
+    /**
+     * Front Controller
+     * @var Zend_Controller_Front
+     */
+    protected $frontController;
+    
+    /**
+     * Name of the file containing classmaps
+     * @var string
+     */
+    protected $classmapFilename = ".classmap.php";
+    
+    /**
+     * Resource Initialization
+     */
+    public function init()
+    {
+        $this->bootstrap = $this->getBootstrap();   
+        $this->bootstrap->bootstrap('modules');
+        
+        $this->frontController = $this->bootstrap->getResource('frontcontroller');
+        $this->frontController instanceof Zend_Controller_Front;
+        
+        $modules = $this->bootstrap->getPluginResource('modules');
+        if ( $modules instanceof Zend_Application_Resource_Modules )
+        {
+            $bootstrapSet = $modules->getExecutedBootstraps();
+            foreach ( $bootstrapSet as $moduleName=>$moduleBootstrap )
+            {
+                $this->_processModuleBootstrap($moduleBootstrap);
+            }
+        }
+    }
+    
+    protected function _processModuleBootstrap($moduleBootstrap)
+    {
+        if ( $moduleBootstrap instanceof Zend_Application_Module_Bootstrap )
+        {
+            $moduleLoader = $moduleBootstrap->getResourceLoader();
+            $classmapFile = implode(DIRECTORY_SEPARATOR, array(
+                $moduleLoader->getBasePath(),
+                $this->frontController->getModuleControllerDirectoryName(),
+                $this->classmapFilename
+            ));
+            if ( Zend_Loader::isReadable($classmapFile) )
+            {
+                $classmap = include($classmapFile);
+                if ( count($classmap) > 0 )
+                {
+                    $namespace = $moduleLoader->getNamespace();
+                    foreach ( $classmap as $className=>$fileName )
+                    {
+                        // Only process controllers which are stored in subdirectories
+                        if ( preg_match("/^{$namespace}_(.+)Controller$/", $className, $matches) )
+                        {
+                            $controllerName = $matches[1];
+                            if ( preg_match('/_/', $controllerName) )
+                            {
+                                $controllerUri = $this->_convertControllerNameToUri($controllerName);
+                                $uri = implode("/", array(
+                                    $this->_convertControllerNameToUri($namespace),
+                                    $controllerUri,
+                                    ':action'
+                                ));
+                                
+                                $route = new Zend_Controller_Router_Route(
+                                    $uri,
+                                    array(
+                                        'module'=>strtolower($moduleBootstrap->getModuleName()),
+                                        'controller'=>str_replace("/","_",$controllerUri),
+                                        'action'=>$this->frontController->getDefaultAction()
+                                    )
+                                );
+                                $this->frontController->getRouter()->addRoute(
+                                    $className,
+                                    $route
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected function _convertControllerNameToUri($controllerName)
+    {
+        $uri = array();
+        $parts = explode("_", $controllerName);
+        if ( count($parts) > 0 )
+        {
+            foreach ( $parts as $part )
+            {
+                $uri[] = preg_replace("/^-/", "", preg_replace("/([A-Z])/e", "'-'.strtolower('\\1')", $part));
+            }
+        }
+        return implode("/", $uri);
+    }
     
 }
