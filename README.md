@@ -18,11 +18,13 @@ stored in `external/zf-examples`.  It currently links everything from the
 free :))
 
 ## Props ##
+<<<<<<< HEAD
 Show these guys some love:
 * Matthew Weier O'Phinney ([weierophinney](http://github.com/weierophinney)) for
   his work on the ZF2 classmap autoloader
 * Ryan Mauger ([bittarman](http://github.com/bittarman)) for showing me that ZFv1
   could do nested controllers, and sharing an example: http://goo.gl/YDlBt
+>>>>>>> 79395cd2f15ab80be00b476ddb64d8d79e28b9eb
 
 USAGE
 -----
