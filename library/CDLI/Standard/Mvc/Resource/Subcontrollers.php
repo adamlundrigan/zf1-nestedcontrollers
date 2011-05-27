@@ -117,7 +117,8 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                                 $uri = implode("/", array(
                                     $this->_convertControllerPartToUri($namespace),
                                     $controllerUri,
-                                    ':action'
+                                    ':action',
+                                    '*'
                                 ));
                                 
                                 // Construct the route
