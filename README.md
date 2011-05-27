@@ -38,7 +38,7 @@ application has the following structure inside the `application/modules` directo
     * controllers
         * Page
             * SubPage
-                * DisplayController.php   (Admin_SubPage_DisplayController)
+                * DisplayController.php   (Admin_Page_SubPage_DisplayController)
             * DisplayController.php   (Admin_Page_DisplayController)
         * StandardController.php  (Admin_StandardController)
 
@@ -73,7 +73,7 @@ Given a nested controller setup such as the following:
     * controllers
         * Page
             * SubPage
-                * DisplayController.php   (Admin_SubPage_DisplayController)
+                * DisplayController.php   (Admin_Page_SubPage_DisplayController)
             * DisplayController.php   (Admin_Page_DisplayController)
         * StandardController.php  (Admin_StandardController)
 
