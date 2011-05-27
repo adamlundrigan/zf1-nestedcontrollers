@@ -1,6 +1,6 @@
 <?php
 
-class Admin_Page_SubPage_DisplayController extends Zend_Controller_Action
+class Admin_StandardController extends Zend_Controller_Action
 {
 
     public function init()
@@ -13,10 +13,6 @@ class Admin_Page_SubPage_DisplayController extends Zend_Controller_Action
         // action body
     }
 
-    public function editAction()
-    {
-        // action body
-    }
-    
+
 }
 
