@@ -85,7 +85,7 @@ construct a custom route for each of the nested controllers:
     admin/page/sub-page/display/:action -> Admin_Page_SubPage_DisplayController
     admin/page/display/:action -> Admin_Page_DisplayController
 
-Non-nested controllers such as Admin_StandardController are not processed, as these
+Non-nested controllers such as `Admin_StandardController` are not processed, as these
 are routed properly by the default route.
 
 DISCLAIMER
