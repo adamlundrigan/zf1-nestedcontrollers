@@ -61,11 +61,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
      */
     public function init()
     {
-        $this->bootstrap = $this->getBootstrap();   
         $this->bootstrap->bootstrap('modules');
-        
-        $this->frontController = $this->bootstrap->getResource('frontcontroller');
-        $this->frontController instanceof Zend_Controller_Front;
         
         $modules = $this->bootstrap->getPluginResource('modules');
         if ( $modules instanceof Zend_Application_Resource_Modules )
@@ -73,17 +69,22 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
             $bootstrapSet = $modules->getExecutedBootstraps();
             foreach ( $bootstrapSet as $moduleName=>$moduleBootstrap )
             {
-                $this->_processModuleBootstrap($moduleBootstrap);
+                $this->frontController->getRouter()->addRoutes(
+                    $this->processModuleBootstrap($moduleBootstrap)
+                );
             }
         }
     }
     
     /**
-     * Add a custom route for the controllers in the module referenced by the bootstrap
+     * Create custom routes for the controllers in the module referenced by the bootstrap
      * @param Zend_Application_Module_Bootstrap $moduleBootstrap bootstrap
+     * @return array Array of custom routes
      */
-    protected function _processModuleBootstrap($moduleBootstrap)
+    public function processModuleBootstrap($moduleBootstrap)
     {
+        $Routes = array();
+        
         if ( $moduleBootstrap instanceof Zend_Application_Module_Bootstrap )
         {
             $moduleLoader = $moduleBootstrap->getResourceLoader();
@@ -104,41 +105,63 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                     // Iterate over each controller in the classmap
                     foreach ( $classmap as $className=>$fileName )
                     {
-                        // Only process controllers which are stored in subdirectories
                         // Extract the controller name part from the class name
                         if ( preg_match("/^{$namespace}_(.+)Controller$/", $className, $matches) )
                         {
                             $controllerName = $matches[1];
-                            // Process only sub-controllers (ie: name-part has _)
+                            // Only process controllers which are stored in subdirectories
                             if ( preg_match('/_/', $controllerName) )
                             {
-                                // Build the URI used to route to this controller
-                                $controllerUri = $this->_convertControllerPartToUri($controllerName);
-                                $uri = implode("/", array(
-                                    $this->_convertControllerPartToUri($namespace),
-                                    $controllerUri,
-                                    ':action',
-                                    '*'
-                                ));
-                                
-                                // Construct the route
-                                $this->frontController->getRouter()->addRoute(
-                                    $className,
-                                    new Zend_Controller_Router_Route(
-                                        $uri,
-                                        array(
-                                            'module'=>strtolower($moduleBootstrap->getModuleName()),
-                                            'controller'=>str_replace("/","_",$controllerUri),
-                                            'action'=>$this->frontController->getDefaultAction()
-                                        )
-                                    )
-                                );
+                                // Generate the route
+                                $Routes[$className] = $this->createRouteFromController(
+                                    $controllerName,
+                                    $moduleBootstrap->getModuleName(),
+                                    $namespace
+                                );                                
                             }
                         }
                     }
                 }
             }
         }
+        
+        return $Routes;
+    }
+    
+    /**
+     * Take information about a controller and build a route to it
+     * @param type $controller Controller Part
+     * @param type $module  Module Name
+     * @param type $namespace Namespace
+     * @return Zend_Controller_Router_Route 
+     */
+    public function createRouteFromController($controller, $module, $namespace)
+    {
+        // Strip off namespace and Controller suffix if it exists
+        $controller = preg_replace(
+            array("/^{$namespace}_/","/Controller$/"),
+            "",
+            $controller
+        );
+        
+        // Build the URI used to route to this controller
+        $controllerUri = $this->convertControllerPartToUri($controller);
+        $uri = implode("/", array(
+            $this->convertControllerPartToUri($namespace),
+            $controllerUri,
+            ':action',
+            '*'
+        ));
+
+        // Construct the route
+        return new Zend_Controller_Router_Route(
+            $uri,
+            array(
+                'module'=>strtolower($module),
+                'controller'=>str_replace("/","_",$controllerUri),
+                'action'=>$this->frontController->getDefaultAction()
+            )
+        );
     }
 
     /**
@@ -147,7 +170,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
      * @param string $controllerPart
      * @return string
      */
-    protected function _convertControllerPartToUri($controllerPart)
+    public function convertControllerPartToUri($controllerPart)
     {
         $uri = array();
         $parts = explode("_", $controllerPart);
@@ -159,6 +182,20 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
             }
         }
         return implode("/", $uri);
+    }
+    
+    /**
+     * Set the bootstrap to which the resource is attached
+     *
+     * @param  Zend_Application_Bootstrap_Bootstrapper $bootstrap
+     * @return Zend_Application_Resource_Resource
+     * @see Zend_Application_Resource_ResourceAbstract::setBootstrap
+     */
+    public function setBootstrap(Zend_Application_Bootstrap_Bootstrapper $bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
+        $this->frontController = Zend_Controller_Front::getInstance();
+        parent::setBootstrap($bootstrap);
     }
     
 }
