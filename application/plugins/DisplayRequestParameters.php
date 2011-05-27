@@ -1,6 +1,6 @@
 <?php
 
-class Demo_Controller_Plugin_DisplayRequestParameters extends Zend_Controller_Plugin_Abstract
+class Application_Plugin_DisplayRequestParameters extends Zend_Controller_Plugin_Abstract
 {
     
     public function dispatchLoopShutdown()
