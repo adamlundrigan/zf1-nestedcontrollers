@@ -27,12 +27,12 @@ directory of the module you wish to add the controller(s) to.  The included exam
 application has the following structure inside the `application/modules` directory:
 
 * admin
-* * controllers
-* * * Page
-* * * * SubPage
-* * * * * DisplayController.php   (Admin_SubPage_DisplayController)
-* * * * DisplayController.php   (Admin_Page_DisplayController)
-* * * StandardController.php  (Admin_StandardController)
+    * controllers
+        * Page
+            * SubPage
+                * DisplayController.php   (Admin_SubPage_DisplayController)
+            * DisplayController.php   (Admin_Page_DisplayController)
+        * StandardController.php  (Admin_StandardController)
 
 When you add new nested controllers to a module in your project, you will need
 to rebuild the classmap file for that module:
@@ -62,12 +62,12 @@ MODUS OPERANDI
 Given a nested controller setup such as the following:
 
 * admin
-* * controllers
-* * * Page
-* * * * SubPage
-* * * * * DisplayController.php   (Admin_SubPage_DisplayController)
-* * * * DisplayController.php   (Admin_Page_DisplayController)
-* * * StandardController.php  (Admin_StandardController)
+    * controllers
+        * Page
+            * SubPage
+                * DisplayController.php   (Admin_SubPage_DisplayController)
+            * DisplayController.php   (Admin_Page_DisplayController)
+        * StandardController.php  (Admin_StandardController)
 
 and the associated classmap file (paths clipped for brevity):
 
