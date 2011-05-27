@@ -13,5 +13,13 @@
             <directory suffix=".php">../../library/Zend</directory>
         </whitelist>
         -->
+        <whitelist>
+            <directory>../application</directory>
+            <directory>../library</directory>
+        </whitelist>
     </filter>
+    
+    <logging>
+        <log type="coverage-html" target="./log/report" />
+    </logging>
 </phpunit>
