@@ -1,5 +1,24 @@
 <h1>Nested Controllers in Zend Framework</h1>
 <ul>
+    <li>Default
+        <ul>
+            <li>Index
+                <ul>
+                    <li><a href="<?php echo $this->baseUrl('/'); ?>">Index</a></li>
+                </ul>
+            </li>
+            <li>Section One
+                <ul>
+                    <li>Page One
+                        <ul>
+                            <li><a href="<?php echo $this->baseUrl('/section-one/page-one'); ?>">Index</a></li>
+                            <li><a href="<?php echo $this->baseUrl('/section-one/page-one/edit'); ?>">Edit</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
     <li>Admin
         <ul>
             <li>Page
