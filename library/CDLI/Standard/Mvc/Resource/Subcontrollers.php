@@ -178,9 +178,13 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
         $parts = explode("_", $controllerPart);
         if ( count($parts) > 0 )
         {
-            foreach ( $parts as $controllerPart )
+            foreach ( $parts as $nr=>$controllerPart )
             {
-                $uri[] = preg_replace("/^-/", "", preg_replace("/([A-Z])/e", "'-'.strtolower('\\1')", $controllerPart));
+                $part = preg_replace("/^-/", "", preg_replace("/([A-Z])/e", "'-'.strtolower('\\1')", $controllerPart));
+                // If first part is the default module, don't include it
+                if ( ! ( $nr == 0 && $part == $this->frontController->getDefaultModule() ) ) {
+                    $uri[] = $part;
+                }
             }
         }
         return implode("/", $uri);
