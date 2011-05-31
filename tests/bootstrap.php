@@ -18,3 +18,4 @@ require_once 'Zend/Loader/Autoloader.php';
 Zend_Loader_Autoloader::getInstance();
 
 require_once "TestCase.php";
+require_once "ControllerTestCase.php";
