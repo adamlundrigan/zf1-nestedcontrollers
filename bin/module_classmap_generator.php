@@ -64,10 +64,10 @@ if ( is_null($moduleName) ) {
     echo $opts->getUsageMessage();
     exit();  
 }
-if ( $moduleName == 'default' ) {
-    echo "Nested controllers in default module is not currently supported\n";
-    exit(2);  
-}
+//if ( $moduleName == 'default' ) {
+//    echo "Nested controllers in default module is not currently supported\n";
+//    exit(2);  
+//}
 
 $moduleDir = $opts->getOption('md');
 if ( is_null($moduleDir) ) $moduleDir = 'modules';
@@ -87,5 +87,5 @@ if ( empty($dir) ) {
     exit();
 }
 
-$cmd = "{$_SERVER['_']} classmap_generator.php --overwrite --library {$dir}";
+$cmd = "{$_SERVER['_']} " . dirname(__FILE__) . "/classmap_generator.php --overwrite --library {$dir}";
 echo shell_exec(escapeshellcmd($cmd));
