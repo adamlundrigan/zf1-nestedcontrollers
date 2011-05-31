@@ -34,6 +34,12 @@ To create nested controllers, simply create sub-folders within the `controllers`
 directory of the module you wish to add the controller(s) to.  The included example
 application has the following structure inside the `application/modules` directory:
 
+* default
+    * controllers
+        * SectionOne
+            * PageOneController.php   (Default_SectionOne_PageOneController)
+        * IndexController.php   (Default_IndexController)
+        * ErrorController.php   (Default_ErrorController)
 * admin
     * controllers
         * Page
