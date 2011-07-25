@@ -27,10 +27,6 @@ require_once "Zend/Console/Getopt.php";
 
 /**
  * Generate module controller class maps for use with namespaced controllers
- *
- * Usage:
- * --help|-h                    Get usage message
- * --module|-m [ <string> ]     Name of the module to generate classmap for
  */
 
 $modulePath = dirname(__FILE__) . "/../application/modules";
