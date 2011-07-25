@@ -29,14 +29,9 @@ require_once "Zend/Console/Getopt.php";
  * Generate module controller class maps for use with namespaced controllers
  */
 
-$modulePath = dirname(__FILE__) . "/../application/modules";
-if ( !is_dir($modulePath) ) {
-    echo "Unable to locate modules directory!\n";
-    exit(2);
-}
-
 $rules = array(
     'help|h'        => 'Get usage message',
+    'appdir|ad-s'   => 'Path to application root',
     'module|m=s'    => 'Name of the module to generate classmap for',
     'module-dir|md-s'    => 'Name of the folder containing modules',
     'controller-dir|cd-s'    => 'Name of the folder containing controllers'
@@ -55,6 +50,22 @@ if ($opts->getOption('h')) {
     exit();
 }
 
+$appdir = $opts->getOption('ad');
+if ( empty($appdir) )
+{
+    $appdir = dirname(__FILE__) . "/../application";
+}
+else
+{
+    $appdir = realpath($appdir);
+}
+
+if ( $appdir === false || !is_dir($appdir) )
+{
+    echo "Unable to locate application directory!\n";
+    exit(2);   
+}
+
 $moduleName = $opts->getOption('m');
 if ( is_null($moduleName) ) {
     echo $opts->getUsageMessage();
@@ -66,10 +77,17 @@ if ( is_null($moduleName) ) {
 //}
 
 $moduleDir = $opts->getOption('md');
-if ( is_null($moduleDir) ) $moduleDir = 'modules';
+if ( empty($moduleDir) ) $moduleDir = 'modules';
 
 $controllerDir = $opts->getOption('cd');
-if ( is_null($controllerDir) ) $controllerDir = 'controllers';
+if ( empty($controllerDir) ) $controllerDir = 'controllers';
+
+$modulePath = "{$appdir}/{$moduleDir}";
+var_dump($modulePath);
+if ( !is_dir($modulePath) ) {
+    echo "Unable to locate modules directory!\n";
+    exit(2);
+}
 
 $dir = realpath(implode(DIRECTORY_SEPARATOR, array(
     $modulePath,
