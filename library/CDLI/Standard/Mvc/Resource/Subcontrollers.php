@@ -146,8 +146,17 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
             $controller
         );
         
-        // Build the URI used to route to this controller
+        // Build the vanity URI used to route to this controller
         $controllerUri = $this->convertControllerPartToUri($controller);
+        
+        // Build the URI we're aliasing over
+        $controllerName = str_replace("/","_",$controllerUri);
+        
+        // If the last sub-part of the controller name is index (ie: Something_IndexController)
+        // then don't include that part in the vanity URI
+        $controllerUri = preg_replace("/\/index$/i", "", $controllerUri);
+
+        // Merge it
         $uri = implode("/", array(
             $this->convertControllerPartToUri($namespace),
             $controllerUri,
@@ -160,7 +169,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
             $uri,
             array(
                 'module'=>strtolower($module),
-                'controller'=>str_replace("/","_",$controllerUri),
+                'controller'=>$controllerName,
                 'action'=>$this->frontController->getDefaultAction()
             )
         );
@@ -187,6 +196,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                 }
             }
         }
+        
         return implode("/", $uri);
     }
     
