@@ -104,6 +104,17 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                 $classmap = include($classmapFile);
                 if ( count($classmap) > 0 )
                 {
+                    // Move all IndexController's to the top of the stack
+                    // so that it doesn't override other controllers at the
+                    // same directory level
+                    // @todo This should be performed when generating classmap file
+                    foreach ( $classmap as $className=>$fileName ) {
+                        if (preg_match('/IndexController.php$/i', $fileName)) {
+                            unset($classmap[$className]);
+                            $classmap = array_merge(array($className=>$fileName), $classmap);
+                        }
+                    }
+                    
                     // Iterate over each controller in the classmap
                     foreach ( $classmap as $className=>$fileName )
                     {
