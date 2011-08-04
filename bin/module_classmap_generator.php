@@ -83,7 +83,6 @@ $controllerDir = $opts->getOption('cd');
 if ( empty($controllerDir) ) $controllerDir = 'controllers';
 
 $modulePath = "{$appdir}/{$moduleDir}";
-var_dump($modulePath);
 if ( !is_dir($modulePath) ) {
     echo "Unable to locate modules directory!\n";
     exit(2);
