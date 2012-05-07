@@ -73,6 +73,10 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
         $Routes = array();
         if ( $this->useSingleClassmapFile() )
         {
+            $Routes = $this->processClassmapFile(implode(DIRECTORY_SEPARATOR, array(
+                APPLICATION_PATH,
+                $this->getClassmapFilename()
+            )));
         }
         else
         {
@@ -214,21 +218,53 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                 // so that it doesn't override other controllers at the
                 // same directory level
                 // @todo This should be performed when generating classmap file
-                foreach ( $classmap as $className=>$fileName ) {
-                    if (preg_match('/IndexController.php$/i', $fileName)) {
+                foreach ( $classmap as $className=>$fileName )
+                {
+                    if (preg_match('/IndexController.php$/i', $fileName))
+                    {
                         unset($classmap[$className]);
                         $classmap = array_merge(array($className=>$fileName), $classmap);
                     }
                 }
+                
+                // If no module or module namespace is provided, divine them
+                if ( is_null($module) || is_null($moduleNamespace) )
+                {
+                    $modules = $this->bootstrap->getPluginResource('modules');
+                    if ( $modules instanceof Zend_Application_Resource_Modules )
+                    {
+                        // Build the module name => module classname prefix mapping
+                        $moduleAliases = array();
+                        $bootstrapSet = $modules->getExecutedBootstraps();
+                        foreach ( $bootstrapSet as $moduleName=>$moduleBootstrap )
+                        {
+                            $moduleAliases[$moduleName] = $moduleBootstrap->getResourceLoader()->getNamespace();
+                        }
+                    }
+                }
 
-                // If we were given a specific module namespace to load, inform the preg
-                $pregPrefix = is_null($moduleNamespace) ? '' : "{$moduleNamespace}_";
-                    
                 // Iterate over each controller in the classmap
                 foreach ( $classmap as $className=>$fileName )
                 {
+                    $localModule = $module;
+                    $localModuleNamespace = $moduleNamespace;
+
+                    // If no module or module namespace was provided, divine one or both
+                    if ( ( is_null($module) || is_null($moduleNamespace) ) && isset($moduleAliases) ) 
+                    {
+                        // No module? no problem!
+                        if ( is_null($module) ) 
+                        {
+                            // Pluck off the first chunk of the name and search for it in the mapping
+                            $controllerNameParts = explode('_', $className);
+                            if ( ! ( $localModule = array_search($controllerNameParts[0], $moduleAliases) ) )
+                                $localModule = NULL;
+                        }
+                        // Look up the classname prefix for the given module
+                        $localModuleNamespace = $moduleAliases[$localModule];
+                    }
                     // Extract the controller name part from the class name
-                    if ( preg_match("/^{$pregPrefix}(.+)Controller$/", $className, $matches) )
+                    if ( preg_match("/^{$localModuleNamespace}_(.+)Controller$/", $className, $matches) )
                     {
                         $controllerName = $matches[1];
                         // Only process controllers which are stored in subdirectories
@@ -237,8 +273,8 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                             // Generate the route
                             $Routes[$className] = $this->createRouteFromController(
                                 $controllerName,
-                                $module,
-                                $moduleNamespace
+                                $localModule,
+                                $localModuleNamespace
                             );                                
                         }
                     }
