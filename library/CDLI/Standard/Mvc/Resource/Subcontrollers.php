@@ -260,7 +260,8 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                                 $localModule = NULL;
                         }
                         // Look up the classname prefix for the given module
-                        $localModuleNamespace = $moduleAliases[$localModule];
+                        $localModuleNamespace = isset($moduleAliases[$localModule])
+                            ? $moduleAliases[$localModule] : NULL;
                     }
                     // Extract the controller name part from the class name
                     if ( preg_match("/^{$localModuleNamespace}_(.+)Controller$/", $className, $matches) )
