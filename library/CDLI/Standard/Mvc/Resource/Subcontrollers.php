@@ -105,7 +105,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
         {
             switch ( $key )
             {
-                case 'singleClassmap':
+                case 'singleClassmapFile':
                 {
                     $this->setUseSingleClassmapFile($option);
                     break;
