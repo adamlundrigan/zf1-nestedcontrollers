@@ -51,6 +51,12 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
     protected $frontController;
     
     /**
+     * Use a single classmap file?
+     * @var boolean
+     */
+    protected $useSingleClassmapFile = false;
+
+    /**
      * Name of the file containing classmaps
      * @var string
      */
@@ -62,7 +68,8 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
     public function init()
     {
         $this->bootstrap->bootstrap('modules');
-        
+        $this->processOptions();
+
         $modules = $this->bootstrap->getPluginResource('modules');
         if ( $modules instanceof Zend_Application_Resource_Modules )
         {
@@ -76,6 +83,75 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                 }
             }
         }
+    }
+
+    /**
+     * Process options from application configuration file
+     */
+    protected function processOptions()
+    {
+        $options = $this->getOptions();
+        foreach ( $options as $key=>$option )
+        {
+            switch ( $key )
+            {
+                case 'singleClassmap':
+                {
+                    $this->setUseSingleClassmapFile($option);
+                    break;
+                }
+                case 'classmapFilename':
+                {
+                    $this->setClassmapFilename($option);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Choose Classmap File operation
+     *   true  = use single, application-wide classmap file
+     *   false = use one clasmap file per module
+     *
+     * @param bool $tf 
+     * @return fluent interface
+     */
+    public function setUseSingleClassmapFile($tf)
+    {
+        $this->useSingleClassmapFile = ($tf == true);
+        return $this;
+    }
+
+    /**
+     * Getter for determining if we're using a single classmap file
+     *
+     * @return bool true = single file, false = one file per module
+     */
+    public function useSingleClassmapFile()
+    {
+        return $this->useSingleClassmapFile === true;
+    }
+    
+    /**
+     * Set the name of the file to load classmaps from
+     * @param string $filename
+     * @return fluent interface
+     */
+    public function setClassmapFilename($filename)
+    {
+        $this->classmapFilename = $filename;
+        return $this;
+    }
+
+    /**
+     * Get the name of the classmap file
+     *
+     * @return string
+     */
+    public function getClassmapFilename()
+    {
+        return $this->classmapFilename;
     }
     
     /**
