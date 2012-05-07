@@ -70,18 +70,28 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
         $this->bootstrap->bootstrap('modules');
         $this->processOptions();
 
-        $modules = $this->bootstrap->getPluginResource('modules');
-        if ( $modules instanceof Zend_Application_Resource_Modules )
+        $Routes = array();
+        if ( $this->useSingleClassmapFile() )
         {
-            $bootstrapSet = $modules->getExecutedBootstraps();
-            foreach ( $bootstrapSet as $moduleName=>$moduleBootstrap )
+        }
+        else
+        {
+            $modules = $this->bootstrap->getPluginResource('modules');
+            if ( $modules instanceof Zend_Application_Resource_Modules )
             {
-                $routes = $this->processModuleBootstrap($moduleBootstrap);
-                if ( count($routes) > 0 )
+                $bootstrapSet = $modules->getExecutedBootstraps();
+                foreach ( $bootstrapSet as $moduleName=>$moduleBootstrap )
                 {
-                    $this->frontController->getRouter()->addRoutes($routes);
+                    $Routes = array_merge(
+                        $Routes, 
+                        $this->processModuleBootstrap($moduleBootstrap)
+                    );
                 }
             }
+        }
+        if ( count($Routes) > 0 )
+        {
+            $this->frontController->getRouter()->addRoutes($Routes);
         }
     }
 
@@ -174,46 +184,67 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
                 $this->frontController->getModuleControllerDirectoryName(),
                 $this->classmapFilename
             ));
-            if ( Zend_Loader::isReadable($classmapFile) )
+            $Routes = $this->processClassmapFile(
+                $classmapFile,
+                $moduleBootstrap->getModuleName(),
+                $namespace
+            );
+        }
+        
+        return $Routes;
+    }
+
+    /**
+     * Process a classmap file, generating routes for each controller class
+     * @param string $classmapFile Path to the classmap file
+     * @param string|null $module Name of module controller belongs to
+     * @param string|null $moduleNamespace Module namespace
+     */
+    public function processClassmapFile($classmapFile, $module=NULL, $moduleNamespace=NULL)
+    {
+        $Routes = array();
+
+        if ( Zend_Loader::isReadable($classmapFile) )
+        {
+            // Load the classmap file
+            $classmap = include($classmapFile);
+            if ( count($classmap) > 0 )
             {
-                // Load the classmap file
-                $classmap = include($classmapFile);
-                if ( count($classmap) > 0 )
-                {
-                    // Move all IndexController's to the top of the stack
-                    // so that it doesn't override other controllers at the
-                    // same directory level
-                    // @todo This should be performed when generating classmap file
-                    foreach ( $classmap as $className=>$fileName ) {
-                        if (preg_match('/IndexController.php$/i', $fileName)) {
-                            unset($classmap[$className]);
-                            $classmap = array_merge(array($className=>$fileName), $classmap);
-                        }
+                // Move all IndexController's to the top of the stack
+                // so that it doesn't override other controllers at the
+                // same directory level
+                // @todo This should be performed when generating classmap file
+                foreach ( $classmap as $className=>$fileName ) {
+                    if (preg_match('/IndexController.php$/i', $fileName)) {
+                        unset($classmap[$className]);
+                        $classmap = array_merge(array($className=>$fileName), $classmap);
                     }
+                }
+
+                // If we were given a specific module namespace to load, inform the preg
+                $pregPrefix = is_null($moduleNamespace) ? '' : "{$moduleNamespace}_";
                     
-                    // Iterate over each controller in the classmap
-                    foreach ( $classmap as $className=>$fileName )
+                // Iterate over each controller in the classmap
+                foreach ( $classmap as $className=>$fileName )
+                {
+                    // Extract the controller name part from the class name
+                    if ( preg_match("/^{$pregPrefix}(.+)Controller$/", $className, $matches) )
                     {
-                        // Extract the controller name part from the class name
-                        if ( preg_match("/^{$namespace}_(.+)Controller$/", $className, $matches) )
+                        $controllerName = $matches[1];
+                        // Only process controllers which are stored in subdirectories
+                        if ( preg_match('/_/', $controllerName) )
                         {
-                            $controllerName = $matches[1];
-                            // Only process controllers which are stored in subdirectories
-                            if ( preg_match('/_/', $controllerName) )
-                            {
-                                // Generate the route
-                                $Routes[$className] = $this->createRouteFromController(
-                                    $controllerName,
-                                    $moduleBootstrap->getModuleName(),
-                                    $namespace
-                                );                                
-                            }
+                            // Generate the route
+                            $Routes[$className] = $this->createRouteFromController(
+                                $controllerName,
+                                $module,
+                                $moduleNamespace
+                            );                                
                         }
                     }
                 }
             }
         }
-        
         return $Routes;
     }
     
