@@ -1,1 +1,1 @@
-../external/zf-examples/zf1-classmap/bin/classmap_generator.php
+../external/zf1-autoloaders/bin/classmap_generator.php
