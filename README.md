@@ -49,10 +49,16 @@ application has the following structure inside the `application/modules` directo
         * StandardController.php  (Admin_StandardController)
 
 When you add new nested controllers to a module in your project, you will need
-to rebuild the classmap file for that module:
+to rebuild the classmap file for that module (or the entire project depending
+on how the plugin is configured):
 
     cd bin;
+
+    # if using per-module classmaps, run:
     php module_classmap_generator.php --module <module name>
+
+    # if using single application-wide classmap, run:
+    php application_classmap_generator.php
 
 > To run this tool, please be sure to have a recent Zend Framework installation
 > on your path
@@ -68,7 +74,38 @@ our nested controllers you must add the following lines to your application.ini:
     resources.subcontrollers[] =
 
 And you're done!  Your application should now be able to route directly to 
-nested controllers
+nested controllers.
+
+#### Classmap Files
+
+By default, the resource plugin is configured to operate using one classmap file
+per module.  To change this, add the following line to your application.ini file:
+
+    resources.subcontrollers.singleClassmapFile = true
+
+And then run the `application_classmap_generator.php` script referenced above.
+This will build a single classmap file named `application/.classmap.php`, and
+all routes will be built from this file.
+
+If you would prefer to use a classmap filename other than `.classmap.php`, follow
+these two easy steps:
+
+1. Rename your existing classmap files, or generate new ones.  Both classmap generator
+scripts accept the `--classmap-file` argument which specifies the output filename.  For
+example, to use `autoload_classmap.php` instead:
+
+        # if using per-module classmaps, run:
+        php bin/module_classmap_generator.php --module <module name> --classmap-file autoload_classmap.php
+
+        # if using single application-wide classmap, run:
+        php bin/application_classmap_generator.php --classmap-file autoload_classmap.php
+
+2. Add the following line to your application.ini file:
+
+        resources.subcontrollers.classmapFilename = <classmap filename>
+
+   Where `<classmap filename>` is the name you chose in #1 above.
+
 
 MODUS OPERANDI
 --------------
