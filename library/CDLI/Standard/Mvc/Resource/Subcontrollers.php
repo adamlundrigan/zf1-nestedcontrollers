@@ -68,7 +68,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
     public function init()
     {
         $this->bootstrap->bootstrap('modules');
-        $this->processOptions($this->getOptions());
+        $this->setOptions($this->getOptions());
 
         $Routes = array();
         if ( $this->useSingleClassmapFile() )
@@ -97,8 +97,9 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
 
     /**
      * Process options from application configuration file
+     * @param $options Array of options to set
      */
-    protected function processOptions($options)
+    public function setOptions($options)
     {
         foreach ( $options as $key=>$option )
         {
