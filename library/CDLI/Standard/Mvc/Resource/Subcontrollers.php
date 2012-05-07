@@ -102,7 +102,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
     /**
      * Process options from application configuration file
      */
-    protected function processOptions($options)
+    public function processOptions($options)
     {
         foreach ( $options as $key=>$option )
         {
