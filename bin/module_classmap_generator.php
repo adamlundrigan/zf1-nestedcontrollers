@@ -34,7 +34,8 @@ $rules = array(
     'module|m=s'    => 'Name of the module to generate classmap for',
     'appdir|ad-s'   => 'Path to application root',
     'module-dir|md-s'    => 'Name of the folder containing modules',
-    'controller-dir|cd-s'    => 'Name of the folder containing controllers'
+    'controller-dir|cd-s'    => 'Name of the folder containing controllers',
+    'classmap-file|cf-s' => 'Name of file to write classmap into'
 );
 
 try {
@@ -64,6 +65,12 @@ if ( $appdir === false || !is_dir($appdir) )
 {
     echo "Unable to locate application directory!\n";
     exit(2);   
+}
+
+$outfile = $opts->getOption('cf');
+if ( empty($outfile) )
+{
+    $outfile = '.classmap.php';
 }
 
 $moduleName = $opts->getOption('m');
@@ -100,5 +107,5 @@ if ( empty($dir) ) {
     exit();
 }
 
-$cmd = "{$_SERVER['_']} " . dirname(__FILE__) . "/classmap_generator.php --overwrite --library {$dir}";
+$cmd = "{$_SERVER['_']} " . dirname(__FILE__) . "/classmap_generator.php --overwrite --library {$dir} --output {$outfile}";
 echo shell_exec(escapeshellcmd($cmd));
