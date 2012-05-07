@@ -31,8 +31,8 @@ require_once "Zend/Console/Getopt.php";
 
 $rules = array(
     'help|h'        => 'Get usage message',
-    'appdir|ad-s'   => 'Path to application root',
     'module|m=s'    => 'Name of the module to generate classmap for',
+    'appdir|ad-s'   => 'Path to application root',
     'module-dir|md-s'    => 'Name of the folder containing modules',
     'controller-dir|cd-s'    => 'Name of the folder containing controllers'
 );
