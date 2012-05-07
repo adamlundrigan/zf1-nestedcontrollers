@@ -182,7 +182,7 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
             $classmapFile = implode(DIRECTORY_SEPARATOR, array(
                 $moduleLoader->getBasePath(),
                 $this->frontController->getModuleControllerDirectoryName(),
-                $this->classmapFilename
+                $this->getClassmapFilename()
             ));
             $Routes = $this->processClassmapFile(
                 $classmapFile,
