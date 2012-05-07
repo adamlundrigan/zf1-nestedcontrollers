@@ -38,8 +38,34 @@ class CDLI_Standard_Mvc_Resource_SubcontrollersTest extends TestCase
         parent::setUp();        
         $this->resource = new CDLI_Standard_Mvc_Resource_Subcontrollers();        
         $this->resource->setBootstrap($this->application->getBootstrap());
+        $this->resource->processOptions(array(
+            'singleClassmapFile' => false,
+            'classmapFilename' => '.classmap.php'
+        ));
+    }
+
+    public function testProcessOptions()
+    {
+        $this->resource->processOptions(array(
+            'singleClassmapFile' => true,
+            'classmapFilename' => 'foobar'
+        ));
+        $this->assertTrue($this->resource->useSingleClassmapFile());
+        $this->assertEquals('foobar', $this->resource->getClassmapFilename());
+    }
+
+    public function testSingleClassmapFileGetterSetter()
+    {
+        $this->resource->setUseSingleClassmapFile(true);
+        $this->assertTrue($this->resource->useSingleClassmapFile());
     }
     
+    public function testClassmapFilenameGetterSetter()
+    {
+        $this->resource->setClassmapFilename('foobar');
+        $this->assertEquals('foobar', $this->resource->getClassmapFilename());
+    }
+
     /**
      * @param string $arg Argument
      * @param string $expectedResult Expected result
@@ -160,4 +186,55 @@ class CDLI_Standard_Mvc_Resource_SubcontrollersTest extends TestCase
         );
     }
     
+    public function testInitWhenUsingSingleClassmapFile()
+    {
+        $this->resource->processOptions(array(
+            'singleClassmapFile' => true,
+            'classmapFilename' => '.classmap.php'
+        ));
+        $this->resource->init();
+
+        $frontController = $this->application->getBootstrap()->getResource('frontcontroller');
+        $router = $frontController->getRouter();
+        $routes = $router->getRoutes();
+
+        // Spot-check the resulting route stack
+        $this->assertArrayHasKey('Admin_Page_SubPage_DisplayController', $routes);
+        $this->assertEquals(
+            'admin/page/sub-page/display',
+            $routes['Admin_Page_SubPage_DisplayController']->assemble(array('action'=>'index'))
+        );
+
+        $this->assertArrayHasKey('Default_SectionOne_PageOneController', $routes);
+        $this->assertEquals(
+            'section-one/page-one',
+            $routes['Default_SectionOne_PageOneController']->assemble(array('action'=>'index'))
+        );
+    }
+
+    public function testInitWhenUsingPerModuleClassmapFile()
+    {
+        $this->resource->processOptions(array(
+            'singleClassmapFile' => false,
+            'classmapFilename' => '.classmap.php'
+        ));
+        $this->resource->init();
+
+        $frontController = $this->application->getBootstrap()->getResource('frontcontroller');
+        $router = $frontController->getRouter();
+        $routes = $router->getRoutes();
+
+        // Spot-check the resulting route stack
+        $this->assertArrayHasKey('Admin_Page_SubPage_DisplayController', $routes);
+        $this->assertEquals(
+            'admin/page/sub-page/display',
+            $routes['Admin_Page_SubPage_DisplayController']->assemble(array('action'=>'index'))
+        );
+
+        $this->assertArrayHasKey('Default_SectionOne_PageOneController', $routes);
+        $this->assertEquals(
+            'section-one/page-one',
+            $routes['Default_SectionOne_PageOneController']->assemble(array('action'=>'index'))
+        );
+    }
 }
