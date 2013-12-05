@@ -1,11 +1,14 @@
 {
     "name": "adamlundrigan/zf1-nestedcontrollers",
     "description": "Nested (sub-folder) controllers in Zend Framework v1.x",
-    "license": "BSD-3-clause",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Adam Lundrigan",
             "email": "adam@lundrigan.ca"
         }
-    ]
+    ],
+    "autoload": {
+        "classmap": ["library/"]
+    }
 }
