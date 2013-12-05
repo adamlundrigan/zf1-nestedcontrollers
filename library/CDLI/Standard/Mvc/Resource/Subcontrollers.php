@@ -25,6 +25,8 @@
  */
 require_once 'Zend/Application/Resource/ResourceAbstract.php';
 
+require_once 'Zend/Filter/Word/CamelCaseToDash.php';
+
 
 /**
  * Application Resource to manage MVC routing to subcontrollers
@@ -337,13 +339,15 @@ class CDLI_Standard_Mvc_Resource_Subcontrollers extends Zend_Application_Resourc
      */
     public function convertControllerPartToUri($controllerPart)
     {
+        $filter = new Zend_Filter_Word_CamelCaseToDash();
+
         $uri = array();
         $parts = explode("_", $controllerPart);
         if ( count($parts) > 0 )
         {
             foreach ( $parts as $nr=>$controllerPart )
             {
-                $part = preg_replace("/^-/", "", preg_replace("/([A-Z])/e", "'-'.strtolower('\\1')", $controllerPart));
+                $part = strtolower($filter->filter($controllerPart));
                 // If first part is the default module, don't include it
                 if ( ! ( $nr == 0 && $part == $this->frontController->getDefaultModule() ) ) {
                     $uri[] = $part;
